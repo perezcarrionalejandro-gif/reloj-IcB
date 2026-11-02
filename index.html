@@ -60,7 +60,7 @@
                 </h1>
             </header>
 
-            <!-- Módulo de Asignatura Actual y Siguiente (Diseño Ultra-Compacto Horizontal) -->
+            <!-- Módulo de Asignatura Actual y Siguiente -->
             <section class="w-full max-w-2xl bg-slate-900/80 backdrop-blur-xl border border-blue-500/30 rounded-2xl px-4 py-2 shadow-lg shadow-blue-950/30 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 text-xs">
                 
                 <!-- Contenedor Flex de la Clase Actual y Siguiente -->
@@ -72,7 +72,7 @@
                         </div>
                         <div class="leading-tight">
                             <div class="flex items-center gap-1.5">
-                                <span class="text-[10px] uppercase tracking-wider font-semibold text-blue-400">Ahora:</span>
+                                <span id="current-label" class="text-[10px] uppercase tracking-wider font-semibold text-blue-400">Ahora:</span>
                                 <h2 id="current-subject" class="text-sm font-bold text-white truncate max-w-[120px] sm:max-w-[160px]">Cargando...</h2>
                             </div>
                             <p id="current-subject-time" class="text-[11px] text-slate-400 font-mono">--:-- - --:--</p>
@@ -89,7 +89,7 @@
                         </div>
                         <div class="leading-tight">
                             <div class="flex items-center gap-1.5">
-                                <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-400">Luego:</span>
+                                <span id="next-label" class="text-[10px] uppercase tracking-wider font-semibold text-slate-400">Luego:</span>
                                 <h3 id="next-subject" class="text-sm font-semibold text-slate-200 truncate max-w-[120px] sm:max-w-[160px]">--</h3>
                             </div>
                             <p id="next-subject-time" class="text-[11px] text-slate-400 font-mono">--:-- - --:--</p>
@@ -97,7 +97,7 @@
                     </div>
                 </div>
 
-                <!-- Botón Toggle Tabla Horario (Compacto) -->
+                <!-- Botón Toggle Tabla Horario -->
                 <button id="toggle-schedule-btn" onclick="toggleScheduleModal()" class="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-semibold text-blue-400 hover:text-blue-300 transition-colors py-1 px-2.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20">
                     <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
                     <span id="toggle-schedule-text">Horario</span>
@@ -113,16 +113,17 @@
                     <table class="w-full text-[11px] text-left text-slate-300 border-collapse">
                         <thead class="text-[10px] uppercase bg-slate-800/70 text-slate-400">
                             <tr>
-                                <th class="p-1.5 border border-slate-800 rounded-tl-lg">Hora</th>
+                                <th class="p-1.5 border border-slate-800">Sesión</th>
+                                <th class="p-1.5 border border-slate-800">Hora</th>
                                 <th class="p-1.5 border border-slate-800">Lun</th>
                                 <th class="p-1.5 border border-slate-800">Mar</th>
                                 <th class="p-1.5 border border-slate-800">Mié</th>
                                 <th class="p-1.5 border border-slate-800">Jue</th>
-                                <th class="p-1.5 border border-slate-800 rounded-tr-lg">Vie</th>
+                                <th class="p-1.5 border border-slate-800">Vie</th>
                             </tr>
                         </thead>
                         <tbody id="schedule-table-body" class="divide-y divide-slate-800/50">
-                            <!-- Rellenado dinámicamente mediante JS -->
+                            <!-- Rellenado dinámicamente -->
                         </tbody>
                     </table>
                 </div>
@@ -133,46 +134,29 @@
                 
                 <!-- Reloj Analógico -->
                 <div class="relative flex flex-col items-center justify-center p-6 bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl w-full max-w-xs sm:max-w-sm">
-                    
-                    <!-- Reloj Canvas / SVG -->
                     <div class="relative w-64 h-64 sm:w-72 sm:h-72 flex items-center justify-center">
                         <svg class="w-full h-full" viewBox="0 0 200 200">
-                            <!-- Esfera exterior -->
                             <circle cx="100" cy="100" r="95" fill="none" stroke="#1e293b" stroke-width="4" />
                             <circle cx="100" cy="100" r="90" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
                             
-                            <!-- Marcas de minutos y horas -->
-                            <g id="clock-marks">
-                                <!-- Generadas dinámicamente con JS -->
-                            </g>
+                            <g id="clock-marks"></g>
+                            <g id="clock-numbers"></g>
 
-                            <!-- Números del 1 al 12 -->
-                            <g id="clock-numbers">
-                                <!-- Generados dinámicamente con JS -->
-                            </g>
-
-                            <!-- Manecilla de Horas -->
                             <line id="hour-hand" x1="100" y1="100" x2="100" y2="60" stroke="#f8fafc" stroke-width="5" stroke-linecap="round" />
-                            
-                            <!-- Manecilla de Minutos -->
                             <line id="minute-hand" x1="100" y1="100" x2="100" y2="40" stroke="#94a3b8" stroke-width="3.5" stroke-linecap="round" />
                             
-                            <!-- Centro del reloj -->
                             <circle cx="100" cy="100" r="5" fill="#3b82f6" />
                             <circle cx="100" cy="100" r="2" fill="#ffffff" />
                         </svg>
                     </div>
 
-                    <!-- Hora digital de respaldo -->
                     <div id="digital-time" class="mt-4 font-mono text-xl sm:text-2xl font-semibold tracking-wider text-slate-300">
                         00:00
                     </div>
                 </div>
 
-                <!-- Módulo Meteorológico (Fijo Jerez de la Frontera) -->
+                <!-- Módulo Meteorológico -->
                 <div class="w-full max-w-xs sm:max-w-sm flex flex-col justify-between p-6 bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl space-y-6">
-                    
-                    <!-- Ubicación Fija -->
                     <div class="space-y-1">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2 text-slate-200 font-semibold text-base sm:text-lg">
@@ -184,7 +168,6 @@
                         <p class="text-xs text-slate-400 pl-7">Cádiz, España</p>
                     </div>
 
-                    <!-- Estado Climático Principal -->
                     <div class="flex items-center justify-between my-2">
                         <div class="flex flex-col">
                             <span id="weather-temp" class="text-5xl font-bold tracking-tight text-white">--°C</span>
@@ -195,7 +178,6 @@
                         </div>
                     </div>
 
-                    <!-- Métricas Secundarias -->
                     <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-800/80">
                         <div class="flex items-center gap-2.5 bg-slate-800/30 p-2.5 rounded-xl border border-slate-800/50">
                             <i data-lucide="thermometer" class="w-4 h-4 text-amber-400"></i>
@@ -213,7 +195,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
 
             </div>
@@ -228,10 +209,8 @@
 
     <!-- Lógica en JavaScript -->
     <script>
-        // Inicializar iconos de Lucide
         lucide.createIcons();
 
-        // Coordenadas fijas para Jerez de la Frontera
         const JEREZ_LAT = 36.6866;
         const JEREZ_LON = -6.0701;
 
@@ -239,13 +218,13 @@
         // HORARIO DE CLASES
         // ----------------------------------------------------
         const classSchedule = [
-            { start: "08:15", end: "09:15", subjects: ["Comentario", "Biología", "Estadística", "Estadística", "Inglés"] },
-            { start: "09:15", end: "10:15", subjects: ["Inglés", "Comentario", "Lengua", "Historia", "Filosofía"] },
-            { start: "10:15", end: "11:15", subjects: ["Química", "Matemáticas", "Matemáticas", "Biología", "Biología"] },
-            { start: "11:15", end: "11:45", subjects: ["RECREO", "RECREO", "RECREO", "RECREO", "RECREO"] },
-            { start: "11:45", end: "12:45", subjects: ["Historia", "Filosofía", "Biología", "Química", "Matemáticas"] },
-            { start: "12:45", end: "13:45", subjects: ["Matemáticas", "Historia", "Química", "Lengua", "Química"] },
-            { start: "13:45", end: "14:45", subjects: ["Lengua", "Inglés", "Historia", "Filosofía", "Religión"] }
+            { period: "1.ª HORA", start: "08:15", end: "09:15", subjects: ["Comentario", "Biología", "Estadística", "Estadística", "Inglés"] },
+            { period: "2.ª HORA", start: "09:15", end: "10:15", subjects: ["Inglés", "Comentario", "Lengua", "Historia", "Filosofía"] },
+            { period: "3.ª HORA", start: "10:15", end: "11:15", subjects: ["Química", "Matemáticas", "Matemáticas", "Biología", "Biología"] },
+            { period: "RECREO",   start: "11:15", end: "11:45", subjects: ["RECREO", "RECREO", "RECREO", "RECREO", "RECREO"] },
+            { period: "4.ª HORA", start: "11:45", end: "12:45", subjects: ["Historia", "Filosofía", "Biología", "Química", "Matemáticas"] },
+            { period: "5.ª HORA", start: "12:45", end: "13:45", subjects: ["Matemáticas", "Historia", "Química", "Lengua", "Química"] },
+            { period: "6.ª HORA", start: "13:45", end: "14:45", subjects: ["Lengua", "Inglés", "Historia", "Filosofía", "Religión"] }
         ];
 
         function timeToMinutes(timeStr) {
@@ -257,16 +236,20 @@
             const dayOfWeek = now.getDay();
             const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
+            const currentLabelEl = document.getElementById('current-label');
             const currentSubjectEl = document.getElementById('current-subject');
             const currentSubjectTimeEl = document.getElementById('current-subject-time');
+            const nextLabelEl = document.getElementById('next-label');
             const nextSubjectEl = document.getElementById('next-subject');
             const nextSubjectTimeEl = document.getElementById('next-subject-time');
 
             if (dayOfWeek === 0 || dayOfWeek === 6) {
+                currentLabelEl.textContent = "Estado:";
                 currentSubjectEl.textContent = "Fin de semana";
                 currentSubjectTimeEl.textContent = "Sin clases programadas";
-                nextSubjectEl.textContent = "Lunes a las 08:15";
-                nextSubjectTimeEl.textContent = classSchedule[0].subjects[0];
+                nextLabelEl.textContent = "Lunes:";
+                nextSubjectEl.textContent = `1.ª HORA (${classSchedule[0].subjects[0]})`;
+                nextSubjectTimeEl.textContent = "08:15 - 09:15";
                 return;
             }
 
@@ -288,32 +271,38 @@
                 }
             }
 
+            // Mostrar hora actual y etiqueta
             if (currentClass) {
                 const subjectName = currentClass.subjects[dayIndex];
+                currentLabelEl.textContent = currentClass.period === "RECREO" ? "Ahora:" : `Ahora (${currentClass.period}):`;
                 currentSubjectEl.textContent = subjectName;
                 currentSubjectTimeEl.textContent = `${currentClass.start} - ${currentClass.end}`;
             } else {
+                currentLabelEl.textContent = "Ahora:";
                 const firstStart = timeToMinutes(classSchedule[0].start);
                 const lastEnd = timeToMinutes(classSchedule[classSchedule.length - 1].end);
 
                 if (currentMinutes < firstStart) {
-                    currentSubjectEl.textContent = "Antes del horario lectivo";
-                    currentSubjectTimeEl.textContent = `La jornada empieza a las ${classSchedule[0].start}`;
+                    currentSubjectEl.textContent = "Antes de clase";
+                    currentSubjectTimeEl.textContent = `Empieza a las ${classSchedule[0].start}`;
                 } else if (currentMinutes >= lastEnd) {
-                    currentSubjectEl.textContent = "Fuera de horario lectivo";
-                    currentSubjectTimeEl.textContent = "Clases finalizadas por hoy";
+                    currentSubjectEl.textContent = "Fuera de horario";
+                    currentSubjectTimeEl.textContent = "Clases finalizadas";
                 } else {
                     currentSubjectEl.textContent = "Cambio de clase";
                     currentSubjectTimeEl.textContent = "--:--";
                 }
             }
 
+            // Mostrar siguiente hora
             if (nextClass) {
                 const nextSubjectName = nextClass.subjects[dayIndex];
+                nextLabelEl.textContent = nextClass.period === "RECREO" ? "Luego:" : `Luego (${nextClass.period}):`;
                 nextSubjectEl.textContent = nextSubjectName;
                 nextSubjectTimeEl.textContent = `${nextClass.start} - ${nextClass.end}`;
             } else {
-                nextSubjectEl.textContent = "Sin más clases hoy";
+                nextLabelEl.textContent = "Luego:";
+                nextSubjectEl.textContent = "Sin más clases";
                 nextSubjectTimeEl.textContent = "Fin de la jornada";
             }
         }
@@ -323,14 +312,15 @@
             let html = '';
 
             classSchedule.forEach((slot) => {
-                const isRecreo = slot.subjects[0] === 'RECREO';
+                const isRecreo = slot.period === 'RECREO';
                 const rowBg = isRecreo ? 'bg-amber-500/10 font-semibold text-amber-300' : 'hover:bg-slate-800/40';
                 
                 html += `<tr class="${rowBg}">`;
-                html += `<td class="p-2 border border-slate-800 font-mono text-slate-400 whitespace-nowrap">${slot.start} - ${slot.end}</td>`;
+                html += `<td class="p-1.5 border border-slate-800 font-semibold text-blue-400 whitespace-nowrap">${slot.period}</td>`;
+                html += `<td class="p-1.5 border border-slate-800 font-mono text-slate-400 whitespace-nowrap">${slot.start} - ${slot.end}</td>`;
                 
                 slot.subjects.forEach((subj) => {
-                    html += `<td class="p-2 border border-slate-800">${subj}</td>`;
+                    html += `<td class="p-1.5 border border-slate-800">${subj}</td>`;
                 });
                 
                 html += `</tr>`;
@@ -399,7 +389,6 @@
 
         function updateClock() {
             const now = new Date();
-
             const minutes = now.getMinutes();
             const hours = now.getHours();
 
@@ -452,7 +441,7 @@
         requestAnimationFrame(tick);
 
         // ----------------------------------------------------
-        // CLIMA EN JEREZ DE LA FRONTERA (OPEN-METEO BLINDADO)
+        // CLIMA EN JEREZ DE LA FRONTERA
         // ----------------------------------------------------
         const wmoCodeMap = {
             0: { desc: 'Cielo Despejado', icon: 'sun' },
@@ -548,7 +537,6 @@
             }
         }
 
-        // Carga inicial y bucle
         loadCachedWeather();
         fetchJerezWeather();
         setInterval(fetchJerezWeather, 10 * 60 * 1000);
