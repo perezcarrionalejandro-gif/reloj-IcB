@@ -12,6 +12,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="apple-touch-icon" href="Sello ciencias de la salud.png">
+    <link rel="icon" type="image/png" href="Sello ciencias de la salud.png">
     <script>
         tailwind.config = {
             theme: {
@@ -105,7 +107,7 @@
             <!-- Tabla de Horario (Desplegable) -->
             <section id="full-schedule-container" class="hidden w-full max-w-2xl bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-2xl p-4 shadow-2xl transition-all">
                 <h3 class="text-xs font-bold text-slate-200 mb-2 flex items-center gap-1.5">
-                    <i data-lucide="clock" class="w-3.5 h-3.5 text-blue-400"></i> Horario
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-blue-400"></i> Horario Semanal Completo
                 </h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-[11px] text-left text-slate-300 border-collapse">
@@ -234,16 +236,16 @@
         const JEREZ_LON = -6.0701;
 
         // ----------------------------------------------------
-        // HORARIO DE CLASES REEMPLAZADO
+        // HORARIO DE CLASES RESTAURADO CON ASIGNATURAS ORIGINALES
         // ----------------------------------------------------
         const classSchedule = [
-            { start: "08:15", end: "09:15", subjects: ["Optativa", "Optativa", "Estadística", "Estadística", "Inglés"] },
-            { start: "09:15", end: "10:15", subjects: ["Inglés", "Optativa", "Lengua", "Historia", "Filosofía"] },
-            { start: "10:15", end: "11:15", subjects: ["Optativa", "Matemáticas", "Matemáticas", "Optativa", "Optativa"] },
+            { start: "08:15", end: "09:15", subjects: ["Comentario", "Biología", "Estadística", "Estadística", "Inglés"] },
+            { start: "09:15", end: "10:15", subjects: ["Inglés", "Comentario", "Lengua", "Historia", "Filosofía"] },
+            { start: "10:15", end: "11:15", subjects: ["Química", "Matemáticas", "Matemáticas", "Biología", "Biología"] },
             { start: "11:15", end: "11:45", subjects: ["RECREO", "RECREO", "RECREO", "RECREO", "RECREO"] },
-            { start: "11:45", end: "12:45", subjects: ["Historia", "Filosofía", "Optativa", "Optativa", "Matemáticas"] },
-            { start: "12:45", end: "13:45", subjects: ["Matemáticas", "Historia", "Optativa", "Lengua", "Optativa"] },
-            { start: "13:45", end: "14:45", subjects: ["Lengua", "Inglés", "Historia", "Filosofía", "Optativa"] }
+            { start: "11:45", end: "12:45", subjects: ["Historia", "Filosofía", "Biología", "Química", "Matemáticas"] },
+            { start: "12:45", end: "13:45", subjects: ["Matemáticas", "Historia", "Química", "Lengua", "Química"] },
+            { start: "13:45", end: "14:45", subjects: ["Lengua", "Inglés", "Historia", "Filosofía", "Religión"] }
         ];
 
         function timeToMinutes(timeStr) {
@@ -332,9 +334,7 @@
                 html += `<td class="p-2 border border-slate-800 font-mono text-slate-400 whitespace-nowrap">${slot.start} - ${slot.end}</td>`;
                 
                 slot.subjects.forEach((subj) => {
-                    const isOpt = subj === 'Optativa';
-                    const textColor = isOpt ? 'text-blue-400 font-medium' : '';
-                    html += `<td class="p-2 border border-slate-800 ${textColor}">${subj}</td>`;
+                    html += `<td class="p-2 border border-slate-800">${subj}</td>`;
                 });
                 
                 html += `</tr>`;
@@ -350,10 +350,10 @@
 
             if (isHidden) {
                 container.classList.remove('hidden');
-                btnText.textContent = "Ocultar Horario";
+                btnText.textContent = "Ocultar";
             } else {
                 container.classList.add('hidden');
-                btnText.textContent = "Ver Horario";
+                btnText.textContent = "Horario";
             }
         }
 
