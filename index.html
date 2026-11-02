@@ -236,7 +236,7 @@
         const JEREZ_LON = -6.0701;
 
         // ----------------------------------------------------
-        // HORARIO DE CLASES RESTAURADO CON ASIGNATURAS ORIGINALES
+        // HORARIO DE CLASES
         // ----------------------------------------------------
         const classSchedule = [
             { start: "08:15", end: "09:15", subjects: ["Comentario", "Biología", "Estadística", "Estadística", "Inglés"] },
@@ -254,7 +254,7 @@
         }
 
         function updateCurrentSubject(now) {
-            const dayOfWeek = now.getDay(); // 0 = Domingo, 1 = Lunes ... 5 = Viernes, 6 = Sábado
+            const dayOfWeek = now.getDay();
             const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
             const currentSubjectEl = document.getElementById('current-subject');
@@ -262,7 +262,6 @@
             const nextSubjectEl = document.getElementById('next-subject');
             const nextSubjectTimeEl = document.getElementById('next-subject-time');
 
-            // Si es fin de semana (Sábado = 6, Domingo = 0)
             if (dayOfWeek === 0 || dayOfWeek === 6) {
                 currentSubjectEl.textContent = "Fin de semana";
                 currentSubjectTimeEl.textContent = "Sin clases programadas";
@@ -271,7 +270,7 @@
                 return;
             }
 
-            const dayIndex = dayOfWeek - 1; // 0 = Lunes, 4 = Viernes
+            const dayIndex = dayOfWeek - 1;
             let currentClass = null;
             let nextClass = null;
 
@@ -289,7 +288,6 @@
                 }
             }
 
-            // Actualizar interfaz para asignatura actual
             if (currentClass) {
                 const subjectName = currentClass.subjects[dayIndex];
                 currentSubjectEl.textContent = subjectName;
@@ -310,7 +308,6 @@
                 }
             }
 
-            // Actualizar interfaz para siguiente asignatura
             if (nextClass) {
                 const nextSubjectName = nextClass.subjects[dayIndex];
                 nextSubjectEl.textContent = nextSubjectName;
@@ -321,7 +318,6 @@
             }
         }
 
-        // Renderizar tabla completa en la interfaz
         function renderScheduleTable() {
             const tableBody = document.getElementById('schedule-table-body');
             let html = '';
@@ -456,7 +452,7 @@
         requestAnimationFrame(tick);
 
         // ----------------------------------------------------
-        // CLIMA EN JEREZ DE LA FRONTERA (OPEN-METEO)
+        // CLIMA EN JEREZ DE LA FRONTERA (OPEN-METEO BLINDADO)
         // ----------------------------------------------------
         const wmoCodeMap = {
             0: { desc: 'Cielo Despejado', icon: 'sun' },
@@ -481,39 +477,79 @@
             96: { desc: 'Tormenta con Granizo', icon: 'cloud-hail' }
         };
 
+        function displayWeatherData(current, timeStr) {
+            document.getElementById('weather-temp').textContent = `${Math.round(current.temperature_2m)}°C`;
+            document.getElementById('weather-feels').textContent = `${Math.round(current.apparent_temperature)}°C`;
+            document.getElementById('weather-humidity').textContent = `${current.relative_humidity_2m}%`;
+
+            const codeInfo = wmoCodeMap[current.weather_code] || { desc: 'Desconocido', icon: 'cloud-sun' };
+            document.getElementById('weather-condition').textContent = codeInfo.desc;
+
+            const iconContainer = document.getElementById('weather-icon-container');
+            iconContainer.innerHTML = `<i data-lucide="${codeInfo.icon}" class="w-12 h-12"></i>`;
+            lucide.createIcons();
+
+            document.getElementById('weather-updated').textContent = `Act. ${timeStr}`;
+        }
+
+        function loadCachedWeather() {
+            const cached = localStorage.getItem('jerez_weather_cache');
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    displayWeatherData(parsed.current, `${parsed.timeStr} (Caché)`);
+                    return true;
+                } catch(e) {}
+            }
+            return false;
+        }
+
         async function fetchJerezWeather() {
+            const updatedEl = document.getElementById('weather-updated');
+            updatedEl.textContent = 'Actualizando...';
+
+            let success = false;
+
             try {
-                document.getElementById('weather-updated').textContent = 'Cargando...';
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 6000);
 
                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${JEREZ_LAT}&longitude=${JEREZ_LON}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code&timezone=auto`;
-                const response = await fetch(url);
                 
-                if (!response.ok) throw new Error('Error en la API');
+                const response = await fetch(url, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
                 const data = await response.json();
                 const current = data.current;
 
-                document.getElementById('weather-temp').textContent = `${Math.round(current.temperature_2m)}°C`;
-                document.getElementById('weather-feels').textContent = `${Math.round(current.apparent_temperature)}°C`;
-                document.getElementById('weather-humidity').textContent = `${current.relative_humidity_2m}%`;
-
-                const codeInfo = wmoCodeMap[current.weather_code] || { desc: 'Desconocido', icon: 'cloud-sun' };
-                document.getElementById('weather-condition').textContent = codeInfo.desc;
-
-                const iconContainer = document.getElementById('weather-icon-container');
-                iconContainer.innerHTML = `<i data-lucide="${codeInfo.icon}" class="w-12 h-12"></i>`;
-                lucide.createIcons();
-
                 const now = new Date();
                 const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-                document.getElementById('weather-updated').textContent = `Act. ${timeString}`;
+
+                localStorage.setItem('jerez_weather_cache', JSON.stringify({ current, timeStr: timeString }));
+
+                displayWeatherData(current, timeString);
+                success = true;
 
             } catch (error) {
-                console.error('Error al obtener datos meteorológicos:', error);
-                document.getElementById('weather-updated').textContent = 'Error al actualizar';
+                console.warn('No se pudo actualizar el tiempo en tiempo real:', error);
+                
+                const loadedFromCache = loadCachedWeather();
+                
+                if (!loadedFromCache && document.getElementById('weather-temp').textContent === '--°C') {
+                    document.getElementById('weather-condition').textContent = 'Sin conexión';
+                    updatedEl.textContent = 'Error al actualizar';
+                }
+            } finally {
+                if (!success) {
+                    setTimeout(fetchJerezWeather, 15000);
+                }
             }
         }
 
+        // Carga inicial y bucle
+        loadCachedWeather();
         fetchJerezWeather();
         setInterval(fetchJerezWeather, 10 * 60 * 1000);
     </script>
