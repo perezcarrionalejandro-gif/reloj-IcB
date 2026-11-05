@@ -41,7 +41,13 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-full font-sans flex flex-col justify-between selection:bg-blue-500 selection:text-white pb-6">
+<body class="bg-slate-950 text-slate-100 min-h-full font-sans flex flex-col justify-between selection:bg-blue-500 selection:text-white pb-6 relative overflow-x-hidden">
+
+    <!-- Capa del Salvapantallas (DVD Bouncing Images) -->
+    <div id="screensaver" class="fixed inset-0 z-50 bg-black/90 hidden pointer-events-none overflow-hidden">
+        <img id="dvd-img-1" src="Fernando_Alonso.jpg" alt="Foto 1" class="absolute w-32 h-32 object-cover rounded-xl shadow-2xl border-2 border-blue-500">
+        <img id="dvd-img-2" src="Cayetano.jpg" alt="Foto 2" class="absolute w-32 h-32 object-cover rounded-xl shadow-2xl border-2 border-indigo-500">
+    </div>
 
     <!-- Fondo de gradiente suave -->
     <div class="fixed inset-0 glow-bg pointer-events-none"></div>
@@ -79,7 +85,7 @@
                         </div>
                     </div>
 
-                    <!-- Separador (Horizontal en móvil, Vertical en escritorio) -->
+                    <!-- Separador -->
                     <div class="h-px sm:h-8 w-full sm:w-px bg-slate-800/80"></div>
 
                     <!-- Siguiente Asignatura -->
@@ -104,7 +110,7 @@
                 </button>
             </section>
 
-            <!-- Tabla de Horario (Desplegable y Scrollable en móvil) -->
+            <!-- Tabla de Horario -->
             <section id="full-schedule-container" class="hidden w-full max-w-2xl bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-2xl p-3 sm:p-4 shadow-2xl transition-all">
                 <h3 class="text-xs font-bold text-slate-200 mb-2 flex items-center gap-1.5">
                     <i data-lucide="clock" class="w-3.5 h-3.5 text-blue-400"></i> Horario Semanal Completo
@@ -123,7 +129,6 @@
                             </tr>
                         </thead>
                         <tbody id="schedule-table-body" class="divide-y divide-slate-800/50">
-                            <!-- Rellenado dinámicamente -->
                         </tbody>
                     </table>
                 </div>
@@ -133,31 +138,25 @@
             <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-center justify-items-center">
                 
                 <!-- Reloj Analógico -->
-                <div class="w-full flex flex-col items-center">
-                    <div class="relative flex flex-col items-center justify-center p-5 sm:p-6 bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl w-full max-w-xs sm:max-w-sm">
-                        <div class="relative w-56 h-56 sm:w-72 sm:h-72 flex items-center justify-center">
-                            <svg class="w-full h-full" viewBox="0 0 200 200">
-                                <circle cx="100" cy="100" r="95" fill="none" stroke="#1e293b" stroke-width="4" />
-                                <circle cx="100" cy="100" r="90" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
-                                
-                                <g id="clock-marks"></g>
-                                <g id="clock-numbers"></g>
+                <div class="relative flex flex-col items-center justify-center p-5 sm:p-6 bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl w-full max-w-xs sm:max-w-sm">
+                    <div class="relative w-56 h-56 sm:w-72 sm:h-72 flex items-center justify-center">
+                        <svg class="w-full h-full" viewBox="0 0 200 200">
+                            <circle cx="100" cy="100" r="95" fill="none" stroke="#1e293b" stroke-width="4" />
+                            <circle cx="100" cy="100" r="90" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+                            
+                            <g id="clock-marks"></g>
+                            <g id="clock-numbers"></g>
 
-                                <line id="hour-hand" x1="100" y1="100" x2="100" y2="60" stroke="#f8fafc" stroke-width="5" stroke-linecap="round" />
-                                <line id="minute-hand" x1="100" y1="100" x2="100" y2="40" stroke="#94a3b8" stroke-width="3.5" stroke-linecap="round" />
-                                
-                                <circle cx="100" cy="100" r="5" fill="#3b82f6" />
-                                <circle cx="100" cy="100" r="2" fill="#ffffff" />
-                            </svg>
-                        </div>
-
-                        <div id="digital-time" class="mt-4 font-mono text-xl sm:text-2xl font-semibold tracking-wider text-slate-300">
-                            00:00
-                        </div>
+                            <line id="hour-hand" x1="100" y1="100" x2="100" y2="60" stroke="#f8fafc" stroke-width="5" stroke-linecap="round" />
+                            <line id="minute-hand" x1="100" y1="100" x2="100" y2="40" stroke="#94a3b8" stroke-width="3.5" stroke-linecap="round" />
+                            
+                            <circle cx="100" cy="100" r="5" fill="#3b82f6" />
+                            <circle cx="100" cy="100" r="2" fill="#ffffff" />
+                        </svg>
                     </div>
-                    <!-- Mensaje condicional debajo del panel del reloj -->
-                    <div id="special-message" class="hidden mt-3 text-center text-sm font-bold text-blue-400 tracking-wider animate-pulse">
-                        Q SI CAYE, Q SI
+
+                    <div id="digital-time" class="mt-4 font-mono text-xl sm:text-2xl font-semibold tracking-wider text-slate-300">
+                        00:00
                     </div>
                 </div>
 
@@ -221,7 +220,72 @@
         const JEREZ_LON = -6.0701;
 
         // ----------------------------------------------------
-        // HORARIO DE CLASES ORIGINAL (MAÑANA)
+        // LÓGICA DEL SALVAPANTALLAS (DVD BOUNCE)
+        // ----------------------------------------------------
+        const screensaverEl = document.getElementById('screensaver');
+        const img1 = document.getElementById('dvd-img-1');
+        const img2 = document.getElementById('dvd-img-2');
+
+        let bounceState = {
+            img1: { x: 50, y: 50, dx: 3, dy: 3 },
+            img2: { x: 200, y: 150, dx: -3, dy: 2 }
+        };
+
+        function animateBounce() {
+            if (screensaverEl.classList.contains('hidden')) return;
+
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            // Mover Imagen 1
+            bounceState.img1.x += bounceState.img1.dx;
+            bounceState.img1.y += bounceState.img1.dy;
+
+            if (bounceState.img1.x + img1.offsetWidth >= width || bounceState.img1.x <= 0) {
+                bounceState.img1.dx *= -1;
+            }
+            if (bounceState.img1.y + img1.offsetHeight >= height || bounceState.img1.y <= 0) {
+                bounceState.img1.dy *= -1;
+            }
+
+            img1.style.left = `${bounceState.img1.x}px`;
+            img1.style.top = `${bounceState.img1.y}px`;
+
+            // Mover Imagen 2
+            bounceState.img2.x += bounceState.img2.dx;
+            bounceState.img2.y += bounceState.img2.dy;
+
+            if (bounceState.img2.x + img2.offsetWidth >= width || bounceState.img2.x <= 0) {
+                bounceState.img2.dx *= -1;
+            }
+            if (bounceState.img2.y + img2.offsetHeight >= height || bounceState.img2.y <= 0) {
+                bounceState.img2.dy *= -1;
+            }
+
+            img2.style.left = `${bounceState.img2.x}px`;
+            img2.style.top = `${bounceState.img2.y}px`;
+
+            requestAnimationFrame(animateBounce);
+        }
+
+        function checkScreensaverTime(minutes) {
+            if (minutes === 33) {
+                if (screensaverEl.classList.contains('hidden')) {
+                    screensaverEl.classList.remove('hidden');
+                    // Reiniciar posiciones dentro del marco visible
+                    bounceState.img1.x = Math.random() * (window.innerWidth - 150);
+                    bounceState.img1.y = Math.random() * (window.innerHeight - 150);
+                    bounceState.img2.x = Math.random() * (window.innerWidth - 150);
+                    bounceState.img2.y = Math.random() * (window.innerHeight - 150);
+                    requestAnimationFrame(animateBounce);
+                }
+            } else {
+                screensaverEl.classList.add('hidden');
+            }
+        }
+
+        // ----------------------------------------------------
+        // HORARIO DE CLASES
         // ----------------------------------------------------
         const classSchedule = [
             { period: "1.ª HORA", start: "08:15", end: "09:15", subjects: ["Comentario", "Biología", "Estadística", "Estadística", "Inglés"] },
@@ -277,7 +341,6 @@
                 }
             }
 
-            // Mostrar hora actual y etiqueta
             if (currentClass) {
                 const subjectName = currentClass.subjects[dayIndex];
                 currentLabelEl.textContent = currentClass.period === "RECREO" ? "Ahora:" : `Ahora (${currentClass.period}):`;
@@ -300,7 +363,6 @@
                 }
             }
 
-            // Mostrar siguiente hora
             if (nextClass) {
                 const nextSubjectName = nextClass.subjects[dayIndex];
                 nextLabelEl.textContent = nextClass.period === "RECREO" ? "Luego:" : `Luego (${nextClass.period}):`;
@@ -420,16 +482,9 @@
             const pad = (n) => n.toString().padStart(2, '0');
             document.getElementById('digital-time').textContent = `${pad(hours)}:${pad(minutes)}`;
 
-            // Mostrar el mensaje especial únicamente durante el minuto 33
-            const specialMessageEl = document.getElementById('special-message');
-            if (minutes === 33) {
-                specialMessageEl.classList.remove('hidden');
-            } else {
-                specialMessageEl.classList.add('hidden');
-            }
-
             updateDate(now);
             updateCurrentSubject(now);
+            checkScreensaverTime(minutes);
         }
 
         function updateDate(now) {
