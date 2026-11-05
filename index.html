@@ -133,25 +133,31 @@
             <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-center justify-items-center">
                 
                 <!-- Reloj Analógico -->
-                <div class="relative flex flex-col items-center justify-center p-5 sm:p-6 bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl w-full max-w-xs sm:max-w-sm">
-                    <div class="relative w-56 h-56 sm:w-72 sm:h-72 flex items-center justify-center">
-                        <svg class="w-full h-full" viewBox="0 0 200 200">
-                            <circle cx="100" cy="100" r="95" fill="none" stroke="#1e293b" stroke-width="4" />
-                            <circle cx="100" cy="100" r="90" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
-                            
-                            <g id="clock-marks"></g>
-                            <g id="clock-numbers"></g>
+                <div class="w-full flex flex-col items-center">
+                    <div class="relative flex flex-col items-center justify-center p-5 sm:p-6 bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl w-full max-w-xs sm:max-w-sm">
+                        <div class="relative w-56 h-56 sm:w-72 sm:h-72 flex items-center justify-center">
+                            <svg class="w-full h-full" viewBox="0 0 200 200">
+                                <circle cx="100" cy="100" r="95" fill="none" stroke="#1e293b" stroke-width="4" />
+                                <circle cx="100" cy="100" r="90" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+                                
+                                <g id="clock-marks"></g>
+                                <g id="clock-numbers"></g>
 
-                            <line id="hour-hand" x1="100" y1="100" x2="100" y2="60" stroke="#f8fafc" stroke-width="5" stroke-linecap="round" />
-                            <line id="minute-hand" x1="100" y1="100" x2="100" y2="40" stroke="#94a3b8" stroke-width="3.5" stroke-linecap="round" />
-                            
-                            <circle cx="100" cy="100" r="5" fill="#3b82f6" />
-                            <circle cx="100" cy="100" r="2" fill="#ffffff" />
-                        </svg>
+                                <line id="hour-hand" x1="100" y1="100" x2="100" y2="60" stroke="#f8fafc" stroke-width="5" stroke-linecap="round" />
+                                <line id="minute-hand" x1="100" y1="100" x2="100" y2="40" stroke="#94a3b8" stroke-width="3.5" stroke-linecap="round" />
+                                
+                                <circle cx="100" cy="100" r="5" fill="#3b82f6" />
+                                <circle cx="100" cy="100" r="2" fill="#ffffff" />
+                            </svg>
+                        </div>
+
+                        <div id="digital-time" class="mt-4 font-mono text-xl sm:text-2xl font-semibold tracking-wider text-slate-300">
+                            00:00
+                        </div>
                     </div>
-
-                    <div id="digital-time" class="mt-4 font-mono text-xl sm:text-2xl font-semibold tracking-wider text-slate-300">
-                        00:00
+                    <!-- Mensaje condicional debajo del panel del reloj -->
+                    <div id="special-message" class="hidden mt-3 text-center text-sm font-bold text-blue-400 tracking-wider animate-pulse">
+                        Q SI CAYE, Q SI
                     </div>
                 </div>
 
@@ -413,6 +419,14 @@
 
             const pad = (n) => n.toString().padStart(2, '0');
             document.getElementById('digital-time').textContent = `${pad(hours)}:${pad(minutes)}`;
+
+            // Mostrar el mensaje especial únicamente durante el minuto 33
+            const specialMessageEl = document.getElementById('special-message');
+            if (minutes === 33) {
+                specialMessageEl.classList.remove('hidden');
+            } else {
+                specialMessageEl.classList.add('hidden');
+            }
 
             updateDate(now);
             updateCurrentSubject(now);
